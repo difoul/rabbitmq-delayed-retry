@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    @Value("${rabbitmq.conf.throttle.exchange.name}")
-    String throttleExchangeName;
+    @Value("${rabbitmq.conf.retry.exchange.name}")
+    String retryExchangeName;
 
-    @Value("${rabbitmq.conf.throttle.queue.name}")
-    String throttleQueueName;
+    @Value("${rabbitmq.conf.retry.queue.name}")
+    String retryQueueName;
 
     @Value("${rabbitmq.conf.events.exchange.name}")
     String eventsExchangeName;
@@ -23,23 +23,23 @@ public class RabbitMQConfiguration {
     @Value("${rabbitmq.conf.message.ttl}")
     int messageTTL;
 
-    @Bean(name = "throttleExchange")
-    TopicExchange throttleExchange(){
-        return  new TopicExchange(throttleExchangeName);
+    @Bean(name = "retryExchange")
+    TopicExchange retryExchange(){
+        return  new TopicExchange(retryExchangeName);
     }
 
-    @Bean(name = "throttleQueue")
-    Queue throttleQueue(){
-        return QueueBuilder.durable(throttleQueueName)
+    @Bean(name = "retryQueue")
+    Queue retryQueue(){
+        return QueueBuilder.durable(retryQueueName)
                 .withArgument("x-dead-letter-exchange", eventsExchangeName)
                 .withArgument("x-message-ttl", messageTTL)
                 .build();
     }
 
-    @Bean(name = "throttleQueueBinding")
-    Binding throttleQueueBinding(){
-        return BindingBuilder.bind(throttleQueue())
-                .to(throttleExchange())
+    @Bean(name = "retryQueueBinding")
+    Binding retryQueueBinding(){
+        return BindingBuilder.bind(retryQueue())
+                .to(retryExchange())
                 .with("#");
     }
 

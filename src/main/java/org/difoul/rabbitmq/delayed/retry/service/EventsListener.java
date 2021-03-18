@@ -17,8 +17,8 @@ public class EventsListener {
     RabbitTemplate rabbitTemplate;
 
     @Autowired
-    @Qualifier("throttleExchange")
-    Exchange throttleExchange;
+    @Qualifier("retryExchange")
+    Exchange retryExchange;
 
 
     @RabbitListener(queues = "#{eventsQueue.name}", concurrency = "${rabbitmq.conf.events.consumers.count}")
@@ -29,7 +29,7 @@ public class EventsListener {
 
         if(retries > 0){
             message.getMessageProperties().getHeaders().put("retries", retries-1);
-            rabbitTemplate.convertAndSend(throttleExchange.getName(), "", message);
+            rabbitTemplate.convertAndSend(retryExchange.getName(), "", message);
         }else{
             System.out.println("Max retries exceeded!");
         }
